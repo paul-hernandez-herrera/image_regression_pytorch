@@ -11,23 +11,24 @@ class parameters_training_images():
         print('------------------------------')
         print('\033[47m' '\033[1m' 'REQUIRED PARAMETERS' '\033[0m')
         print('------------------------------')
-        number_classes_options = [('2', '2'),
-                                  ('3', '3'),
-                                  ('4', '4'),
-                                  ('5', '5'),
-                                  ('6', '6'),
-                                  ('7', '7'),
-                                  ('8', '8'),
-                                  ('9', '9'),
-                                  ('10', '10'),]
+        number_options = [('1', '1'),
+            ('2', '2'),
+            ('3', '3'),
+            ('4', '4'),
+            ('5', '5'),
+            ('6', '6'),
+            ('7', '7'),
+            ('8', '8'),
+            ('9', '9'),
+            ('10', '10'),]
         
-        self.n_classes_w = ipwidget_basic.set_dropdown('Number of classes: ', number_classes_options)
+        self.n_classes_w = ipwidget_basic.set_dropdown('Number of folders: ', number_options)
         self.n_classes_w.observe(self.dropdown_handler_n_classes, names='value')
         
-        #default number of classes equal to 2
+        #default number of folders equal to 2
         self.folder_input_w = []
-        for i in range(0, 2):
-            self.folder_input_w.append(ipwidget_basic.set_text(f"Folder path - Class {i+1}:", 'Insert path here', show=False))
+        for i in range(0, 1):
+            self.folder_input_w.append(ipwidget_basic.set_text(f"Folder path -  {i+1}:", 'Insert path here', show=False))
         
         #container for the parameters. Default is Adam
         self.main_container = widgets.VBox(children= self.folder_input_w)
@@ -38,7 +39,7 @@ class parameters_training_images():
         # Define a dictionary to map optimizer names to their parameters
         self.folder_input_w = []
         for i in range(0, int(change.new)):
-            self.folder_input_w.append(ipwidget_basic.set_text(f"Folder path - Class {i+1}:", 'Insert path here', show=False))
+            self.folder_input_w.append(ipwidget_basic.set_text(f"Folder path - {i+1}:", 'Insert path here', show=False))
             
         self.main_container.children = self.folder_input_w
         
