@@ -1,5 +1,6 @@
 import tifffile
 from pathlib import Path
+import pandas as pd
 
 
 def imread(filename):
@@ -38,4 +39,11 @@ def write_list_to_file(file_name, data):
             f.write(f'{line}\n')
     f.close()
 
+def pandas_read_array(csv_dataset_file_path):
+    #read pandas data frame
+    pd_data = pd.read_csv(csv_dataset_file_path, header = None)
+    #convert data to numpy array
+    data = pd_data.values
+
+    return data
     
