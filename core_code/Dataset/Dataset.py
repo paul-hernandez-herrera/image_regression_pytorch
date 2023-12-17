@@ -5,7 +5,6 @@ from pathlib import Path
 import numpy as np
 from torch import tensor
 from ..util.preprocess import preprocess_image
-from torchvision.transforms import Resize
 import warnings
 
 class CustomImageDataset(Dataset):
@@ -22,7 +21,6 @@ class CustomImageDataset(Dataset):
         
         #reading all files in target folder
         self.input_images_path = []
-        self.labels = np.zeros((0,1))
         for folder_path in list_folders:
             current_image_paths = [p for p in Path(folder_path).iterdir() if p.suffix in valid_suffix] 
             self.input_images_path += current_image_paths
@@ -33,26 +31,21 @@ class CustomImageDataset(Dataset):
         #check that every csv file has the same size
         self.target_shape = check_csv_size_matching(self.input_images_path)
         
-        #check if we need to resize images to a commun shape
-        self.resize = True ## setting resize to True, since model ResNet50 requires image shape (224,224)
-        if not self.resize:
-            self.resize = not check_training_set_equal_img_sizes(self.path_files)
-        
-        self.input_size = np.array([224, 224]) if self.resize else util.imread(self.path_files[idx]).shape[-2:]
-        self.transform_resize = Resize((int(self.input_size[0]), int(self.input_size[1])), antialias='True') if self.resize else None
+        #check images all the images have commun shape
+        check_training_set_equal_img_sizes(self.input_images_path)
         
         self.num_classes = len(self.list_folders)
         
     def __len__(self):
-        return len(self.path_files)
+        return len(self.input_images_path)
     
-    def __n_classes__(self):
-        return len(self.list_folders)
+    def __targetshape__(self):
+        return self.target_shape
         
     def __getitem__(self, idx):
         #reading input and target images
         input_img = util.imread(self.input_images_path[idx])
-        target = np.loadtxt(Path(self.input_images_path[idx].parent, self.input_images_path[idx].stem + '.csv') )
+        target = util.pandas_read_array(Path(self.input_images_path[idx].parent, self.input_images_path[idx].stem + '.csv') )
         
         #preprocess image if required
         if self.enable_preprocess:
@@ -64,15 +57,10 @@ class CustomImageDataset(Dataset):
         
         #converting targets to one_hot encoding. [1,C]. Loss functions requires [C,1]
         # target = one_hot(target, num_classes= self.num_classes).permute(1,0)
-        
-        # resize image to shape (224,224)
-        input_img = self.transform_resize(input_img)
-
 
         #Pytorch CNN requires dimensions to be [C,W,H] for images. Make sure that we have Channel dimension
         input_img = input_img.unsqueeze(0) if input_img.dim() == 2 else input_img
             
-        
         if self.data_augmentation_flag:
             input_img = self.data_augmentation_object.run(input_img)
         
@@ -98,20 +86,19 @@ def check_trainingset_file_matching(input_images_path):
     
 def check_csv_size_matching(input_images_path):
     # we require the output to have the same number of coordinates
-    target_0 = np.loadtxt(Path(input_images_path[0].parent, input_images_path[0].stem + '.csv') )
+    target_0 = util.pandas_read_array(Path(input_images_path[0].parent, input_images_path[0].stem + '.csv') )
     for file_path in input_images_path:
-        current_csv_target = np.loadtxt(Path(file_path.parent, file_path.stem + '.csv'))
+        current_csv_target = util.pandas_read_array(Path(file_path.parent, file_path.stem + '.csv'))
         if not target_0.shape == current_csv_target.shape:
-            raise ValueError(f"CSV file {input_images_path[0]} does not have the same same as {file_path}")
+            raise ValueError(f"CSV file {input_images_path[0]} does not have the same shape as {file_path}")
     return target_0        
 
-def check_training_set_equal_img_sizes(path_files):
+def check_training_set_equal_img_sizes(input_images_path):
     #verify that every image has the same shape
-    img_shape = util.imread(path_files[0]).shape
+    img_shape = util.imread(input_images_path[0]).shape
     
-    for f in path_files:
-        current_img_shape = util.imread(f).shape
+    for file_path in input_images_path:
+        current_img_shape = util.imread(file_path).shape
         if current_img_shape!=img_shape:
-            warnings.warn("Training set have images with different shape. Resizing to default size: (224x224)")
-            return False
-    return True
+            raise ValueError("Training set have images with different shape. Images file {input_images_path[0]} does not have the same shape as {file_path}")
+    print("\nPass: all images have the same shape")
