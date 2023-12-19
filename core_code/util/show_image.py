@@ -18,20 +18,19 @@ def show_images_from_Dataset(custom_dataset, n_images_to_display=3):
 
     if n_channels == 1:
         axs = axs.reshape(-1, 1)
-
     
     for i in range(n_images_to_display):
-        img, label = custom_dataset[np.random.randint(len(custom_dataset))]
-        
-        img, label = img.numpy(), label.numpy()
+        img, target_points = custom_dataset[np.random.randint(len(custom_dataset))]
+        img, target_points = img.numpy(), target_points.numpy()
         img = convert_img_shape_to_C_W_H(img)
-        label = np.argmax(label)
         
         for j in range(n_channels):
-            axs[i,j].imshow(img[j], cmap='gray')
-            axs[i,j].set_title(f'Image {i} - Ch{j} ---- LABEL = {label}')
-            axs[i,j].axis('off')
-            fig.colorbar(axs[i,j].imshow(img[j], cmap='gray'), ax=axs[i,j])
+            ax = axs[i,j]
+            ax.imshow(img[j], cmap='gray')
+            ax.plot(target_points[:,0],target_points[:,1],'r*')
+            ax.set_title(f'Image {i} - Ch{j} ---- Target points = Red points')
+            ax.axis('off')
+            fig.colorbar(ax.imshow(img[j], cmap='gray'), ax=ax)
         
     plt.tight_layout()
     plt.show()    
