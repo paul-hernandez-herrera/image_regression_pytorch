@@ -15,6 +15,10 @@ def show_images_from_Dataset(custom_dataset, n_images_to_display=3):
     # Create figure with subplots for each image and its channels
     n_channels = custom_dataset[0][0].shape[0]
     fig, axs = plt.subplots(n_images_to_display, n_channels, figsize=(10, 20), dpi=80)
+
+    if n_channels == 1:
+        axs = axs.reshape(-1, 1)
+
     
     for i in range(n_images_to_display):
         img, label = custom_dataset[np.random.randint(len(custom_dataset))]
