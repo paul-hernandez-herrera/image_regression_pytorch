@@ -33,10 +33,9 @@ class augmentation_task():
         image, bboxes, labels = trans(image, bboxes, np.ones((bboxes.shape[0], 1)))
         return image, bboxes
     
-    def vertical_flip(self, image):        
+    def vertical_flip(self, image, bboxes):        
         #random horizontal flip
-        print("Doing vertical flip")
-        trans = transforms.Compose([transforms.RandomVerticalFlip(p=0)])
+        trans = transforms.Compose([transforms.RandomVerticalFlip(p=0.5)])
         image, bboxes, labels = trans(image, bboxes, np.ones((bboxes.shape[0], 1)))
         return image, bboxes
     
@@ -69,10 +68,9 @@ class augmentation_task():
             image, bboxes = self.horizontal_flip(image, bboxes.numpy())
             
         if self.enable_vflip:
-            image = self.vertical_flip(image)
+            image, bboxes = self.vertical_flip(image, bboxes)
             
         if self.enable_zoom:
-            print("ZOOM")
             image = self.affine_zoom(image)
             
         if self.enable_shear:
@@ -80,7 +78,6 @@ class augmentation_task():
         
         points = tensor(bboxes[:,0:2]).float()
 
-        print(f"type points: {type(points)}" )
         return image, points
     
 def points_to_bboxes(points, img):
