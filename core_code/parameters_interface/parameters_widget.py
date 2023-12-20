@@ -307,7 +307,7 @@ class parameters_data_augmentation():
             'enable_hflip': self.hflip_flag_w.value,
             'enable_vflip': self.vflip_flag_w.value, 
             'enable_shear': self.shear_flag_w.value, 
-            'enable_zoom': self.shear_flag_w.value, 
+            'enable_zoom': self.zoom_flag_w.value, 
             'shear_angle': self.shear_angle_w.value,  
             'zoom_range': self.zoom_range_w.value
             }
