@@ -1,7 +1,7 @@
 import ipywidgets as widgets
 import torch
 from IPython.display import display
-from ..Dataset.data_augmentation_classification import augmentation_classification_task
+from ..Dataset.data_augmentation_regression import augmentation_task
 from . import ipwidget_basic
     
 ################################################################################
@@ -83,7 +83,7 @@ class parameters_create_training_set():
 ################################################################################.
 
 
-class parameters_model_training_classification():
+class parameters_model_training_regression():
     def __init__(self, n_classes):
         print('------------------------------')
         print('\033[42m' '\033[1m' '    REQUIRED PARAMETERS     ' '\033[0m')
@@ -272,7 +272,7 @@ class parameters_data_augmentation():
     def __init__(self):
         
         #to retrieve default values
-        dummy = augmentation_classification_task()
+        dummy = augmentation_task()
         
         # options for loss functions
         self.data_augmentation_flag_w = ipwidget_basic.set_checkbox('Data augmentation', False, show = False)

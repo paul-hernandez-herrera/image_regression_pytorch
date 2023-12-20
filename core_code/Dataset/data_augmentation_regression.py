@@ -6,7 +6,7 @@ import torchvision
 import numpy as np
 from torch import tensor
 
-class augmentation_classification_task():
+class augmentation_task():
     def __init__(self, zoom_range = [0.8, 1.2],
                  shear_angle = [-5, 5], 
                  img_resize = [224,224],
@@ -29,15 +29,16 @@ class augmentation_classification_task():
         
     def horizontal_flip(self, image, bboxes):        
         #random horizontal flip
-        trans = transforms.Compose([transforms.RandomHorizontalFlip(p=0)])
+        trans = transforms.Compose([transforms.RandomHorizontalFlip(p=0.5)])
         image, bboxes, labels = trans(image, bboxes, np.ones((bboxes.shape[0], 1)))
         return image, bboxes
     
     def vertical_flip(self, image):        
-        #random vertical flip    
-        if np.random.uniform(0, 1) > 0.5:
-            image = vflip(image)
-        return image 
+        #random horizontal flip
+        print("Doing vertical flip")
+        trans = transforms.Compose([transforms.RandomVerticalFlip(p=0)])
+        image, bboxes, labels = trans(image, bboxes, np.ones((bboxes.shape[0], 1)))
+        return image, bboxes
     
     def affine_transform(self, image, scale=1, angle=0, translate=[0, 0], shear=0):
         image = affine(image, scale=scale, angle=angle, translate=translate, shear=shear)

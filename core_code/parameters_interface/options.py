@@ -1,7 +1,7 @@
 from torch.optim import SGD, Adam, NAdam, RMSprop
 from torch.optim.lr_scheduler import ReduceLROnPlateau, CyclicLR, CosineAnnealingLR, StepLR
 from ..loss.binary_loss import BinaryLoss
-from ..Dataset.data_augmentation_classification import augmentation_classification_task
+from ..Dataset.data_augmentation_regression import augmentation_task
 from typing import Dict
 from torch.nn import CrossEntropyLoss
 from ..Dataset.Dataset import CustomImageDataset
@@ -72,7 +72,7 @@ def get_loss_function(option_name: str):
 
 def get_data_augmentation(enable_data_augmentation = True, **kargs): 
     if enable_data_augmentation:
-        return augmentation_classification_task(**kargs)
+        return augmentation_task(**kargs)
     return None
 
 ###################################################################
