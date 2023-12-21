@@ -39,17 +39,16 @@ class augmentation_task():
         image, bboxes, labels = trans(image, bboxes, np.ones((bboxes.shape[0], 1)))
         return image, bboxes
     
-    def affine_transform(self, image, scale=1, angle=0, translate=[0, 0], shear=0):
-        image = affine(image, scale=scale, angle=angle, translate=translate, shear=shear)
-        image = affine(image, scale=scale, angle=angle, translate=translate, shear=shear)
-        return image    
+    def affine_transform(self, image, bboxes, scale=(1,1), angle=0, translate=[0, 0], shear=0):
+        trans = transforms.Compose([transforms.RandomAffine(scale=scale, degrees=angle, translate=translate, shear=shear)])
+        #image = affine(image, scale=scale, angle=angle, translate=translate, shear=shear)
+        image, bboxes, labels = trans(image, bboxes, np.ones((bboxes.shape[0], 1)))
+        return image, bboxes            
     
-    def affine_zoom(self, image):        
+    def affine_zoom(self, image, bboxes):        
         #random zoom
-        if np.random.uniform(0, 1) > 0.5:
-            zoom = np.random.uniform(*self.zoom_range)
-            image = self.affine_transform(image, scale=zoom)
-        return image
+        image, bboxes = self.affine_transform(image, bboxes, scale = (self.zoom_range[0],self.zoom_range[1]))
+        return image, bboxes
     
     def affine_shear(self, image):        
         #random shear
@@ -71,7 +70,7 @@ class augmentation_task():
             image, bboxes = self.vertical_flip(image, bboxes)
             
         if self.enable_zoom:
-            image = self.affine_zoom(image)
+            image, bboxes = self.affine_zoom(image, bboxes)
             
         if self.enable_shear:
             image = self.affine_shear(image)
@@ -83,8 +82,9 @@ class augmentation_task():
 def points_to_bboxes(points, img):
     ones_columns = np.ones((points.shape[0], 2))
     bboxes = np.hstack((points, ones_columns))
+    bboxes = np.hstack((points, ones_columns))
     bboxes = datapoints.BoundingBox(bboxes,
-                                    format=datapoints.BoundingBoxFormat.XYXY,
+                                    format=datapoints.BoundingBoxFormat.XYWH,
                                     spatial_size=transforms.functional.get_spatial_size(img),
                                     )
     return bboxes
