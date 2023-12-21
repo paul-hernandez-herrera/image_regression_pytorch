@@ -1,8 +1,6 @@
-from torchvision.transforms.functional import affine, hflip, vflip
 from torchvision.transforms import Resize
 import torchvision.transforms.v2 as transforms
 from torchvision import datapoints
-import torchvision
 import numpy as np
 from torch import tensor
 
