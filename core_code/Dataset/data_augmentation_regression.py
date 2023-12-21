@@ -47,7 +47,8 @@ class augmentation_task():
     
     def affine_zoom(self, image, bboxes):        
         #random zoom
-        image, bboxes = self.affine_transform(image, bboxes, scale = (self.zoom_range[0],self.zoom_range[1]))
+        if np.random.uniform(0, 1) > 0.5:
+            image, bboxes = self.affine_transform(image, bboxes, scale = (self.zoom_range[0],self.zoom_range[1]))
         return image, bboxes
     
     def affine_shear(self, image):        
