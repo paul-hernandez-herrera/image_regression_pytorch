@@ -51,12 +51,12 @@ class augmentation_task():
             image, bboxes = self.affine_transform(image, bboxes, scale = (self.zoom_range[0],self.zoom_range[1]))
         return image, bboxes
     
-    def affine_shear(self, image):        
+    def affine_shear(self, image, bboxes):        
         #random shear
         if np.random.uniform(0, 1) > 0.5:
-            shear = np.random.uniform(*self.shear_angle)
-            image = self.affine_transform(image, shear=shear)
-        return image
+            s_a1, s_a2 = self.shear_angle
+            image, bboxes = self.affine_transform(image, bboxes, shear=(s_a1, s_a2,s_a1, s_a2))
+        return image, bboxes
         
     def run(self, image, points):
 
@@ -65,7 +65,7 @@ class augmentation_task():
             image = self.transform_resize(image)
         
         if self.enable_hflip:
-            image, bboxes = self.horizontal_flip(image, bboxes.numpy())
+            image, bboxes = self.horizontal_flip(image, bboxes)
             
         if self.enable_vflip:
             image, bboxes = self.vertical_flip(image, bboxes)
@@ -74,7 +74,7 @@ class augmentation_task():
             image, bboxes = self.affine_zoom(image, bboxes)
             
         if self.enable_shear:
-            image = self.affine_shear(image)
+            image, bboxes = self.affine_shear(image, bboxes)
         
         points = tensor(bboxes[:,0:2]).float()
 
