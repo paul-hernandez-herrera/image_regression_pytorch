@@ -7,6 +7,7 @@ from torch.nn import CrossEntropyLoss
 from ..Dataset.Dataset import CustomImageDataset
 from torch.utils.data import random_split
 from torch.utils.data.dataset import Subset
+from ..loss.regression_loss import MDE_points
 import copy
 
 def get_optimizer(option_name: str, 
@@ -57,12 +58,8 @@ def get_lr_scheduler(option_name: str, optimizer, **kwargs) -> object:
 ###################################################################
 
 def get_loss_function(option_name: str):
-    if option_name == 'cross_entropy': 
-        loss_function = [CrossEntropyLoss()]
-    elif option_name == 'dice_loss': 
-        loss_function = [BinaryLoss('dice')]
-    elif option_name == 'dice_cross': 
-        loss_function = [BinaryLoss('dice'), CrossEntropyLoss()]
+    if option_name == 'MDE_points': 
+        loss_function = [MDE_points()]
     else:
         raise Exception("Sorry, " + option_name + " not recognized as loss function option.")
         
