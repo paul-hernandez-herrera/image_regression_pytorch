@@ -84,7 +84,7 @@ class parameters_create_training_set():
 
 
 class parameters_model_training_regression():
-    def __init__(self, n_classes):
+    def __init__(self):
         print('------------------------------')
         print('\033[42m' '\033[1m' '    REQUIRED PARAMETERS     ' '\033[0m')
         print('------------------------------')        
@@ -98,7 +98,7 @@ class parameters_model_training_regression():
         self.number_epochs_w = ipwidget_basic.set_Int('Number of epochs: ', 100)
         
         print('------------------------------')
-        self.criterion_loss = parameters_loss_function(n_classes)
+        self.criterion_loss = parameters_loss_function()
     
         print('------------------------------')
         self.optimizer = parameters_optimizer()
@@ -107,10 +107,10 @@ class parameters_model_training_regression():
         self.lr_scheduler = parameters_lr_scheduler()     
         
         print('------------------------------')
-        self.validation = parameters_validation_testing_set('Validation :', n_classes, dropdown_default = 'percentage_training_set')
+        self.validation = parameters_validation_testing_set('Validation :', dropdown_default = 'None')
         
         print('------------------------------')
-        self.test = parameters_validation_testing_set('Test :', n_classes, dropdown_default = 'None')
+        self.test = parameters_validation_testing_set('Test :', dropdown_default = 'percentage_training_set')
     
     def get(self, str_id):
         parameters = {
@@ -199,13 +199,11 @@ class parameters_optimizer():
 ################################################################################
 
 class parameters_loss_function():
-    def __init__(self, n_channels_target):
+    def __init__(self):
         
         # options for loss functions depending on the problem to solve
         loss_functions = [
-            ('Dice + Cross Entropy', 'dice_cross'), 
-            ('Cross entropy loss', 'cross_entropy'),
-            ('Dice loss', 'dice_loss')
+            ('Mean Square Error', 'MSE')
         ]
         self.loss_w = ipwidget_basic.set_dropdown('Loss function: ', loss_functions)
         
@@ -216,13 +214,12 @@ class parameters_loss_function():
 ################################################################################
 
 class parameters_validation_testing_set():
-    def __init__(self, dropdown_label, 
-                 n_classes,
+    def __init__(self, 
+                 dropdown_label, 
                  dropdown_default = 'percentage_training_set'):
         # options for loss functions
         options_dropdown = [
             ('% of training set', 'percentage_training_set'),
-            ('Folder paths', 'folder_path'),
             ('None', 'None')
             ]
         
@@ -231,10 +228,7 @@ class parameters_validation_testing_set():
         
         self.validation_w = ipwidget_basic.set_dropdown(dropdown_label, options_dropdown)
         
-        self.perc_training_set = ipwidget_basic.set_Float_Bounded(' ', 0.05, 0, 1, 0.01)
-        self.folder_input_w = []
-        for i in range(0, n_classes):
-            self.folder_input_w.append(ipwidget_basic.set_text(f"Folder path - Class {i+1}:", 'Insert path here', show=False))     
+        self.perc_training_set = ipwidget_basic.set_Float_Bounded(' ', 0.05, 0, 1, 0.01)    
         
         self.main_container = widgets.VBox(children= [])
         self.set_value_container(dropdown_default)
@@ -245,12 +239,9 @@ class parameters_validation_testing_set():
         
     def dropdown_handler_validation(self, change):
         self.set_value_container(change.new)
-
             
     def set_value_container(self, children_id):
-        if children_id == 'folder_path':
-            self.main_container.children = self.folder_input_w
-        elif children_id == 'percentage_training_set':
+        if children_id == 'percentage_training_set':
             self.main_container.children = [self.perc_training_set]
         elif children_id == 'None':
             self.main_container.children = []        
@@ -259,7 +250,6 @@ class parameters_validation_testing_set():
         folder_path_list = [p.value for p in self.folder_input_w]
         parameters = {
             'type': self.validation_w.value,
-            'folder_input_list': folder_path_list,
             'per_val': self.perc_training_set.value
             }
         return parameters
