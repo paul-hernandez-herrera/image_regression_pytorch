@@ -203,7 +203,7 @@ class parameters_loss_function():
         
         # options for loss functions depending on the problem to solve
         loss_functions = [
-            ('Mean Square Error', 'MSE')
+            ('Mean Distance Error - Points', 'MDE_points')
         ]
         self.loss_w = ipwidget_basic.set_dropdown('Loss function: ', loss_functions)
         
