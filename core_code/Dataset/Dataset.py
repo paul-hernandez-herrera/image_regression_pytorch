@@ -34,8 +34,6 @@ class CustomImageDataset(Dataset):
         #check images all the images have commun shape
         check_training_set_equal_img_sizes(self.input_images_path)
         
-        self.num_classes = len(self.list_folders)
-        
     def __len__(self):
         return len(self.input_images_path)
     
