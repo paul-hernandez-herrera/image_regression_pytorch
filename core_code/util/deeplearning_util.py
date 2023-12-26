@@ -156,14 +156,14 @@ def load_model(model_path, device = 'cpu'):
 def get_batch_size(
     device: torch.device,
     input_shape: t.Tuple[int, int, int],
-    output_shape: t.Tuple[int],
+    output_nodes: int,
     dataset_size: int,
     model_type: str = 'resnet50',
     max_batch_size: int = None,
     num_iterations: int = 5,
 ) -> int:
     
-    model = get_model(model_type, input_shape[0], output_shape[0])
+    model = get_model(model_type, input_shape[0], output_nodes)
     model.to(device)
     model.train(True)
     optimizer = torch.optim.Adam(model.parameters())
@@ -180,7 +180,7 @@ def get_batch_size(
             for _ in range(num_iterations):
                 # dummy inputs and targets
                 inputs = torch.rand(*(batch_size, *input_shape), device=device)
-                targets = torch.rand(*(batch_size, *output_shape), device=device)
+                targets = torch.rand(*(batch_size, output_nodes), device=device)
                 outputs = model(inputs)
                 loss = F.mse_loss(targets, outputs)
                 loss.backward()
@@ -195,7 +195,7 @@ def get_batch_size(
       
     return batch_size
 
-def get_model(model_type, n_channels_input, out_features):
+def get_model(model_type, n_channels_input, output_nodes):
     if model_type == 'resnet50':
         model = torchvision.models.resnet50()
         
@@ -205,7 +205,7 @@ def get_model(model_type, n_channels_input, out_features):
         
         #Adjust the fc to the number of output classes
         model.fc = nn.Linear(in_features=2048, 
-                             out_features= out_features
+                             out_features= output_nodes
                              )
         return model
     
