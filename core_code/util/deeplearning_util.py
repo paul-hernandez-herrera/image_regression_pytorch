@@ -156,14 +156,14 @@ def load_model(model_path, device = 'cpu'):
 def get_batch_size(
     device: torch.device,
     input_shape: t.Tuple[int, int, int],
-    output_nodes: int,
+    output_nodes: t.Tuple[int, int],
     dataset_size: int,
     model_type: str = 'resnet50',
     max_batch_size: int = None,
     num_iterations: int = 5,
 ) -> int:
     
-    model = get_model(model_type, input_shape[0], output_nodes)
+    model = get_model(model_type, input_shape[0], np.array(output_nodes))
     model.to(device)
     model.train(True)
     optimizer = torch.optim.Adam(model.parameters())
@@ -180,7 +180,7 @@ def get_batch_size(
             for _ in range(num_iterations):
                 # dummy inputs and targets
                 inputs = torch.rand(*(batch_size, *input_shape), device=device)
-                targets = torch.rand(*(batch_size, output_nodes), device=device)
+                targets = torch.rand(*(batch_size, *output_nodes), device=device)
                 outputs = model(inputs)
                 loss = F.mse_loss(targets, outputs)
                 loss.backward()
@@ -195,18 +195,24 @@ def get_batch_size(
       
     return batch_size
 
-def get_model(model_type, n_channels_input, output_nodes):
+def get_model(model_type, n_channels_input, output_shape):
     if model_type == 'resnet50':
         model = torchvision.models.resnet50()
         
-        #Adjust the conv1 to the number of input channels
+        # Adjust the conv1 to the number of input channels
         model.conv1 = Conv2d(n_channels_input, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
         
+        # convert shape to single vector output
+        output_nodes = output_shape[0]*output_shape[1]
         
-        #Adjust the fc to the number of output classes
-        model.fc = nn.Linear(in_features=2048, 
-                             out_features= output_nodes
-                             )
+        # Adjust the fc to the number of output classes
+        model.fc = nn.Sequential(
+            nn.Linear(in_features=2048, 
+                                out_features= output_nodes
+                                ),
+            nn.Unflatten(1, torch.Size([int(output_shape[0]), int(output_shape[1])]))
+        )
+
         return model
     
 def get_dataloader_file_names(dataset_loader, fullpath = True):
