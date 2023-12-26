@@ -247,7 +247,6 @@ class parameters_validation_testing_set():
             self.main_container.children = []        
             
     def get(self):
-        folder_path_list = [p.value for p in self.folder_input_w]
         parameters = {
             'type': self.validation_w.value,
             'per_val': self.perc_training_set.value
