@@ -89,7 +89,7 @@ def check_csv_size_matching(input_images_path):
         current_csv_target = util.pandas_read_array(Path(file_path.parent, file_path.stem + '.csv'))
         if not target_0.shape == current_csv_target.shape:
             raise ValueError(f"CSV file {input_images_path[0]} does not have the same shape as {file_path}")
-    return target_0        
+    return target_0.shape    
 
 def check_training_set_equal_img_sizes(input_images_path):
     #verify that every image has the same shape
