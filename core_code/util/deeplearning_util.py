@@ -222,7 +222,7 @@ def get_model(model_type, n_channels_input, output_shape):
 def get_dataloader_file_names(dataset_loader, fullpath = True):
     #index and file_names from test images
     index = np.array(dataset_loader.dataset.indices)
-    file_names = [dataset_loader.dataset.dataset.path_files[i] if fullpath else dataset_loader.dataset.dataset.path_files[i].stem for i in index]
+    file_names = [dataset_loader.dataset.dataset.input_images_path[i] if fullpath else dataset_loader.dataset.dataset.input_images_path[i].stem for i in index]
     
     return file_names
     
