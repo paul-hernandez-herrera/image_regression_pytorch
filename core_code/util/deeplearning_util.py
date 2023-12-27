@@ -133,9 +133,13 @@ def load_model(model_path, device = 'cpu'):
     state_dict = torch.load(model_path, map_location= device)
 
     n_channels_input = state_dict[list(state_dict.keys())[0]].size(1)
-    n_classes = state_dict[list(state_dict.keys())[-1]].size(0)
+    output_nodes = state_dict[list(state_dict.keys())[-1]].size(0)
+
+    # We assume that current model is developed for 2D data
+    n_rows = int(output_nodes/2)
+    n_columns = 2
     
-    model = get_model('resnet50', n_channels_input, n_classes).to(device= device)
+    model = get_model('resnet50', n_channels_input, np.array([n_rows, n_columns])).to(device= device)
     
     try:
         model.load_state_dict(state_dict)
