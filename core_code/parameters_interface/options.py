@@ -85,10 +85,16 @@ def get_split_training_val_test_sets(train_dataset, val_par, test_par):
         train_dataset, val_set, test_set = random_split(train_dataset, [1-perc1-perc2, perc1, perc2])
         
     train_dataset = copy.deepcopy(train_dataset)
-    if val_set: 
-        val_set.dataset.set_data_augmentation(augmentation_flag = False)
-    if isinstance(val_set, Subset):
-        val_set.dataset.set_data_augmentation(augmentation_flag = False)
+
+    if not isinstance(train_dataset, Subset):
+        train_dataset = random_split(train_dataset,[1])[0]
+    if (not isinstance(val_set, Subset)) & (val_set!=None):
+        val_set = random_split(val_set,[1])
+    if (not (isinstance(test_set, Subset))) & (test_set!=None):
+        test_set = random_split(test_set,[1])
+
+    val_set.dataset.set_data_augmentation(augmentation_flag = False)
+        
     return train_dataset, val_set, test_set
 
 def split_dataset(train_dataset, parameters_1, parameters_2):
