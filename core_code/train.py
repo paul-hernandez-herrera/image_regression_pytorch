@@ -32,7 +32,7 @@ def train_model(model,
     for epoch in range(1, epochs+1):
         print(f"Running iteration {epoch}/{epochs}")
         model_loss = train_one_epoch(model, train_loader, optimizer, loss_functions, device)
-        print(f"Training epoch loss: {model_loss} --- lr = {optimizer.param_groups[0]['lr']}")
+        print(f"Training epoch average loss: {model_loss} --- lr = {optimizer.param_groups[0]['lr']}")
         
         val_loss = calculate_validation_loss(model, validation_loader, loss_functions, device) if validation_loader else None
         val_loss = val_loss or model_loss
