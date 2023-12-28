@@ -29,8 +29,8 @@ def train_one_epoch(model, train_loader, optimizer, loss_functions, device):
         network_output = model(imgs) 
         
         #output from model is [B,C], changing to [B, C, 1]
-        network_output = torch.unsqueeze(network_output, dim = -1)
-        
+        #network_output = torch.unsqueeze(network_output, dim = -1)
+
         # Compute the loss
         loss = sum([f(network_output, targets) for f in loss_functions]) # compute the error between the network output and target output
         
