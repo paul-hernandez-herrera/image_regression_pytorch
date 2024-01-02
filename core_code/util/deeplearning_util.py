@@ -56,10 +56,7 @@ def calculate_validation_loss(model, validation_loader, loss_functions, device):
             imgs = imgs.to(device= device, dtype = torch.float32)
             targets = targets.to(device= device, dtype = torch.float32)
             
-            network_output = model(imgs) #applying the model to the input images
-            
-            #output from model is [B,C], changing to [B, C, 1]
-            network_output = torch.unsqueeze(network_output, dim = -1)            
+            network_output = model(imgs) #applying the model to the input images          
             
             loss = sum([loss_fn(network_output, targets) for loss_fn in loss_functions]) # compute the error between the network output and target output
             
@@ -71,12 +68,13 @@ def calculate_validation_loss(model, validation_loader, loss_functions, device):
 def calculate_test_performance(model, test_loader, device, folder_output = None):
     model.eval() #set the model in evaluation mode
     
-    ground_truth_labels = np.array([])
-    network_labels = np.array([])
+    target_shape = test_loader.dataset.dataset.__targetshape__()
+    ground_truth_labels = np.zeros((0, target_shape[0],target_shape[1]))
+    network_labels = np.zeros((0, target_shape[0],target_shape[1]))
     
     #index and file_names from test images
     index = np.array(test_loader.dataset.indices)
-    file_names = [test_loader.dataset.dataset.path_files[i].stem for i in index]
+    file_names = [test_loader.dataset.dataset.input_images_path[i].stem for i in index]
     
     k = 0
     with torch.no_grad():  # disable gradient calculations during evaluation
@@ -90,34 +88,16 @@ def calculate_test_performance(model, test_loader, device, folder_output = None)
             network_output = model(imgs) #applying the model to the input images
             
             #targets is shape [B,C,1] changing to [B,C] and getting the class label
-            targets_class = torch.argmax(torch.squeeze(targets, dim = -1), dim=1).cpu().numpy()
-            
+            targets_points = targets.cpu().numpy()
             
             #output from model is [B,C]. Calculate network labels
-            network_output = torch.argmax(torch.sigmoid(network_output), dim=1).cpu().numpy()
-                        
-            ground_truth_labels = np.hstack((ground_truth_labels, targets_class) )
-            network_labels = np.hstack((network_labels, network_output) )
+            network_output = network_output.cpu().numpy()
+
+            ground_truth_labels = np.concatenate((ground_truth_labels, targets_points), axis = 0 )
+            network_labels = np.concatenate((network_labels, network_output), axis = 0  )
             
-            #saving image and prediction
-            for j in range(0, len(targets_class)):
-                current_output = network_output[j]
-                current_target = targets_class[j]
-                
-                # Calculate probability map and convert to numpy array
-                file_id = file_names[k]
-                k+=1
-                
-                util.imwrite(Path(folder_output, f'{file_id}_pred_{current_output}_target_{current_target}.tif'), (255*imgs[j,:,:,:]).cpu().numpy().astype(np.uint8))
-    
     for i in range(0, len(file_names)):
         print(f'{file_names[i]} --- (gt, predicted) = ({ground_truth_labels[i]}, {network_labels[i]})')
-            
-    confusion_matrix = metrics.confusion_matrix(ground_truth_labels, network_labels)
-    
-    print(confusion_matrix)    
-    
-    
     
     return 0
 
