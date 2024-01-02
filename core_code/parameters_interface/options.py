@@ -93,7 +93,8 @@ def get_split_training_val_test_sets(train_dataset, val_par, test_par):
     if (not (isinstance(test_set, Subset))) & (test_set!=None):
         test_set = random_split(test_set,[1])
 
-    val_set.dataset.set_data_augmentation(augmentation_flag = False)
+    if val_set != None:
+        val_set.dataset.set_data_augmentation(augmentation_flag = False)
         
     return train_dataset, val_set, test_set
 
