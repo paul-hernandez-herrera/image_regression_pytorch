@@ -88,8 +88,8 @@ class augmentation_task():
 
         if self.enable_rotation:
             image, bboxes = self.affine_transform(image, bboxes)
-        
-        points = tensor(bboxes[:,0:2]).float()
+
+        points = bboxes[:,0:2].float()
 
         return image, points
     
