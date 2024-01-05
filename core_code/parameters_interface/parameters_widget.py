@@ -111,6 +111,9 @@ class parameters_model_training_regression():
         
         print('------------------------------')
         self.test = parameters_validation_testing_set('Test :', dropdown_default = 'percentage_training_set')
+
+        print('------------------------------')
+        self.model_initialization_w    = ipwidget_basic.set_text('Model initialization: ', 'Insert model path here')
     
     def get(self, str_id):
         parameters = {
@@ -123,7 +126,8 @@ class parameters_model_training_regression():
             'lr_scheduler_par': self.lr_scheduler.get(),
             'model_output_folder': self.model_saving.get('model_output_folder'),
             'model_checkpoint': self.model_saving.get('model_checkpoint'),
-            'model_checkpoint_frequency': self.model_saving.get('model_checkpoint_frequency')
+            'model_checkpoint_frequency': self.model_saving.get('model_checkpoint_frequency'),
+            'model_initialization': self.model_initialization_w.value
         }
         return parameters[str_id]
 
