@@ -1,11 +1,14 @@
 import tifffile
 from pathlib import Path
 import pandas as pd
+import skimage.io as io
 
 
 def imread(filename):
-    if Path(filename).suffix in {'.tif', '.tiff'}:
+    if Path(filename).suffix.lower() in {'.tif', '.tiff'}:
         return tifffile.imread(filename)
+    if Path(filename).suffix.lower() in {'.mhd'}:
+        return io.imread(filename, plugin='simpleitk')
         
 def imwrite(filename, arr):
     if Path(filename).suffix in {'.tif', '.tiff'}:
@@ -46,4 +49,8 @@ def pandas_read_array(csv_dataset_file_path):
     data = pd_data.values
 
     return data
+
+def write_csv(file_name, array):
+    df = pd.DataFrame(array)
+    df.to_csv(file_name, index=False, header = None)
     
