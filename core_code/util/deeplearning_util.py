@@ -54,11 +54,12 @@ def calculate_validation_loss(model, validation_loader, loss_functions, device):
             
             #we have a tensor in the validation_loader, move to device
             imgs = imgs.to(device= device, dtype = torch.float32)
-            targets = targets.to(device= device, dtype = torch.float32)
+            targets = targets.to(device= device, dtype = torch.float32)            
             
             network_output = model(imgs) #applying the model to the input images          
             
-            loss = sum([loss_fn(network_output, targets) for loss_fn in loss_functions]) # compute the error between the network output and target output
+            # Compute the loss
+            loss = sum([f(network_output, targets) for f in loss_functions]) # compute the error between the network output and target output
             
             val_loss += loss.item()
         val_loss /= len(validation_loader.dataset)
